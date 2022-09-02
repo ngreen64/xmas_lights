@@ -8,14 +8,13 @@ from struct import unpack
 import numpy as np
 import pyaudio
 import math
-import sys
+#import sys
 
 no_channels = 1
 sample_rate = 44100
 chunk = 3072
-no_of_pixels = 100
-pixels_per_freq = no_of_pixels/8
-pixels = neopixel.NeoPixel(board.D18, no_of_pixels, auto_write=False)
+length_of_pixels = 100
+pixels = neopixel.NeoPixel(board.D18, length_of_pixels, auto_write=False)
 
 matrix    = [0,0,0,0,0,0,0,0]
 power     = []
@@ -33,7 +32,7 @@ def list_devices():
         i += 1
 
 list_devices()
-device = 2
+device = 1
 
 p = pyaudio.PyAudio()
 stream = p.open(format = pyaudio.paInt16,
@@ -94,43 +93,20 @@ while 1:
         # Get microphone data
         data = stream.read(chunk, exception_on_overflow = False)
         matrix=calculate_levels(data, chunk,sample_rate)
-        for i in range(no_of_pixels):
-            pixels[i] = (0,0,0)
-
-        pixel_position = 0
 
         for i in range(8):
-            height = math.floor((1+matrix[int(i)])/(256/pixels_per_freq))
-            pixel_range = math.floor(pixels_per_freq)
-            pixel_overhang = pixels_per_freq - pixel_range
-
-            for x in range(int(pixel_range)):
+            height = math.floor((1+matrix[int(i)])/32)
+            for x in range(8):
+                pixel = 8*i + x
                 if 0 < height >= x:
-                    if x < pixels_per_freq/3:
-                       pixel_colour = (70,70,200)
-                    elif pixels_per_freq/3 <= x < pixels_per_freq/1.5:
-                       pixel_colour = (70,70,200)
+                    if  x < 3:
+                        pixels[pixel] = (70,70,200)
+                    elif 3 <= x < 6:
+                        pixels[pixel] = (0,0,255)
                     else:
-                       pixel_colour = (0,255,0)
-                    if pixel_position.is_integer():
-                       pixels[pixel_position] = pixel_colour
+                        pixels[pixel] = (0,255,0)
                 else:
                     pixels[pixel] = (0,0,0)
-
-
-            # Need to add on to the above the overhang pixel handling now.
-        sys.exit()
-#            for x in range(8):
-#                pixel = 8*i + x
-#                if 0 < height >= x:
-#                    if  x < 3:
-#                        pixels[pixel] = (70,70,200)
-#                    elif 3 <= x < 6:
-#                        pixels[pixel] = (0,0,255)
-#                    else:
-#                        pixels[pixel] = (0,255,0)
-#                else:
-#                    pixels[pixel] = (0,0,0)
 
         pixels.show()
     except KeyboardInterrupt:
