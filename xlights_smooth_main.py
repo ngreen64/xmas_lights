@@ -8,6 +8,8 @@ from pprint import pprint
 from time import sleep
 import sys
 
+randomised="no"
+
 # g,r,b
 def current_milli_time():
     return round(time.time() * 1000)
@@ -31,7 +33,6 @@ def calc_intensity_values(position_diff,light_span):
 
 def set_fade_factor(timenow,last_random_change):
      global randomise
-     global randomised
      global fade_status
      global fade_factor
      if randomise == "y" and fade_status == "fade":
@@ -63,9 +64,9 @@ def do_randomisation(timenow):
        global direction
        global bidirectional
        global fade_status
-       global ramdomised
        global fade_start_time
        global gap_between_lights_ms
+       global randomised
        if timenow > last_random_change + rand_change_time*1000: # It's time to randomise
           if fade_status == "none":
              fade_status="fade"
@@ -166,7 +167,6 @@ fading_time_ms=1000 # Defines how long fade in/out takes in milliseconds
 # Do not change these
 pixels = neopixel.NeoPixel(board.D18, no_of_lights, auto_write=False)
 last_random_change=start_time
-randomised="no"
 time_for_run_new = time_for_run
 lights_at_a_time_new = lights_at_a_time
 default_light_falloff_new = default_light_falloff
