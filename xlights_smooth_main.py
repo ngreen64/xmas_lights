@@ -8,11 +8,13 @@ from pprint import pprint
 from time import sleep
 import sys
 
-randomised="no"
+
 
 # g,r,b
 def current_milli_time():
     return round(time.time() * 1000)
+   
+# Common modules
 
 def give_me_a_colour(direction,light_falloff,time_for_run):
     a = 0
@@ -109,7 +111,7 @@ def do_randomisation(timenow):
            fade_status="fade"
            fade_start_time = timenow
       
-
+# Import light pattern modules
 
 def calculate_light(light_dir):
     global x
@@ -150,33 +152,38 @@ def calculate_light(light_dir):
                       light_values_now[bulb_no][p] = light_values_next[bulb_no][p]
             x+=1
 
-# variables
+# Tunable common variables - i.e. not module specific
 no_of_lights=100
-time_for_run=30
-lights_at_a_time=1
 timelast=current_milli_time()
-default_light_falloff=1.0 # This can either be an integer e.g. 6, or declared as a string for a range e.g. "6-10". Set 1 or higher!
-current_gap=0
-gap_between_lights_ms=gap_between_lights()
 start_time=timelast
-direction="positive"
-
-bidirectional="y"
 randomise="y"
+randomised="no"
 rand_change_time=5 # Sets the initial random change time in seconds
 max_rand_change_time=30 # Define the maximum random change time (not currently used?)
 fading_time_ms=1000 # Defines how long fade in/out takes in milliseconds
 
-# Do not change these
+# Non-tunable variables
 pixels = neopixel.NeoPixel(board.D18, no_of_lights, auto_write=False)
 last_random_change=start_time
-time_for_run_new = time_for_run
-lights_at_a_time_new = lights_at_a_time
-default_light_falloff_new = default_light_falloff
 fade_status="none"
 fade_factor=1
+first_run="yes"
 
-# Calculate position and intensity of lights forward and backward 
+############################# Specific module vars start ####################################
+time_for_run=30
+lights_at_a_time=1
+direction="positive"
+bidirectional="y"
+default_light_falloff=1.0 # This can either be an integer e.g. 6, or declared as a string for a range e.g. "6-10". Set 1 or higher!
+current_gap=0
+gap_between_lights_ms=gap_between_lights()
+default_light_falloff_new = default_light_falloff
+lights_at_a_time_new = lights_at_a_time
+time_for_run_new = time_for_run
+############################# Specific module vars end ####################################
+
+
+# Calculate position and intensity of lights 
 light_values_now = {}
 colours_in_play = {}
 light_values_next = {}
@@ -184,11 +191,6 @@ light_values_next = {}
 fps=0
 fps_count=current_milli_time()
 frames=0
-
-if isinstance(default_light_falloff, float):
-    colours_in_play[fps_count] = give_me_a_colour(direction,default_light_falloff,time_for_run)
-else:
-    colours_in_play[fps_count] = give_me_a_colour(direction,random.uniform(float(default_light_falloff.split("-")[0]),float(default_light_falloff.split("-")[1])),time_for_run)
     
 # All variables pre-set now let's loop...
 while True:
@@ -212,6 +214,14 @@ while True:
    # Calculate fading for random transition
    if randomise == "y":
       set_fade_factor(timenow,last_random_change)
+      
+############################# Specific module start ####################################
+
+   if first_run == "yes":
+      if isinstance(default_light_falloff, float):
+         colours_in_play[timenow] = give_me_a_colour(direction,default_light_falloff,time_for_run)
+      else:
+         colours_in_play[timenow] = give_me_a_colour(direction,random.uniform(float(default_light_falloff.split("-")[0]),float(default_light_falloff.split("-")[1])),time_for_run)
 
    # Insert a new colour should the gap be big enough and reset gap timer
    if t_delta >= gap_between_lights_ms:
@@ -256,6 +266,8 @@ while True:
      x = closest_low_pos + 1
      # then light forwards...
      calculate_light("forward")
+     
+############################# Specific module end ####################################
 
    for item in light_values_now:
         try:
@@ -269,3 +281,5 @@ while True:
 
    if randomise == "y":
       do_randomisation(timenow)
+   if first_run == "yes":
+      first_run="no"
