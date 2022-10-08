@@ -123,7 +123,7 @@ def calculate_light(light_dir):
                break
             intensity = calc_intensity_values(pos_delta,light_span)
             bulb_no = round(position - pos_delta)
-            light_values_next[bulb_no] = [ colours_in_play[colour_time][0]*intensity*fade_factor, colours_in_play[colour_time][1]*intensity*fade_factor, colours_in_play[colour_time][2]*intensity*fade_factor ]
+            light_values_next[bulb_no] = [ colours_in_play[colour_time][0]*intensity, colours_in_play[colour_time][1]*intensity, colours_in_play[colour_time][2]*intensity ]
             if light_values_now[bulb_no] == [0,0,0]:
                light_values_now[bulb_no] = light_values_next[bulb_no]
             else:
@@ -141,7 +141,7 @@ def calculate_light(light_dir):
                break
             intensity = calc_intensity_values(pos_delta,light_span)
             bulb_no = round(position + pos_delta)
-            light_values_next[bulb_no] = [ colours_in_play[colour_time][0]*intensity*fade_factor, colours_in_play[colour_time][1]*intensity*fade_factor, colours_in_play[colour_time][2]*intensity*fade_factor ]
+            light_values_next[bulb_no] = [ colours_in_play[colour_time][0]*intensity, colours_in_play[colour_time][1]*intensity, colours_in_play[colour_time][2]*intensity ]
             if light_values_now[bulb_no] == [0,0,0]:
                light_values_now[bulb_no] = light_values_next[bulb_no]
             else:
@@ -259,17 +259,13 @@ while True:
 
    for item in light_values_now:
         try:
-            pixels[item] = light_values_now[item]
+            pixels[item] = [light_values_now[item][0]*fade_factor, light_values_now[item][1]*fade_factor, light_values_now[item][2]*fade_factor]
         except:
             pprint(light_values_now)
             pprint(colours_in_play)
             sys.exit()
 
    pixels.show()
-#   pprint(light_values_now)
-#   for i in range(0,10):
-#       print(str(i) + " " + str(light_values_now[i][0] + light_values_now[i][1] + light_values_now[i][2]))
-#   pprint(colours_in_play)
-#   sys.exit()
+
    if randomise == "y":
       do_randomisation(timenow)
