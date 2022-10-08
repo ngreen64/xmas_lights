@@ -25,7 +25,7 @@ def give_me_a_colour(direction,light_falloff,time_for_run):
     return (a,b,c,direction,light_falloff,time_for_run)
 
 def gap_between_lights():
-    print("Gap between lights needs to be " + str((time_for_run*1000)/lights_at_a_time))
+    #print("Gap between lights needs to be " + str((time_for_run*1000)/lights_at_a_time))
     return (time_for_run*1000)/lights_at_a_time
 
 def calc_intensity_values(position_diff,light_span):
@@ -35,77 +35,80 @@ def set_fade_factor(timenow,last_random_change):
      global randomise
      global fade_status
      global fade_factor
-     if randomise == "y" and fade_status == "fade":
+     global fade_start_time
+     if fade_status == "fade":
         fade_factor = 1-(timenow-fade_start_time)/fading_time_ms
+        print("Fading to zero")
         if fade_factor < 0.005:
             fade_factor=0
-            fade_status="unfade"
-            randomised = "yes"
-            print("Fading..... Fade_status = " + fade_status + ", randomise = " + randomise + ", fade_factor = " + str(fade_factor) + ", last random change = " + str(last_random_change))
-     elif randomise == "y" and fade_status == "unfade" :
+            print("Fading complete")
+        
+     elif fade_status == "unfade" :
         fade_factor = (timenow-last_random_change)/fading_time_ms
+        print("Unfading from zero")
         if fade_factor >= 1:
             fade_factor=1
             fade_status="none"
-            print("Unfading..... Fade_status = " + fade_status + ", randomise = " + randomise + ", fade_factor = " + str(fade_factor) + ", last random change = " + str(last_random_change))
-     else:
-         fade_factor=1
+            print("Unfading complete")
 
 def do_randomisation(timenow):
-   if randomise == "y":
-       # Change settings at random. Wait between 10-30 seconds between changes before changing again.
-       global last_random_change
-       global lights_at_a_time_new
-       global lights_at_a_time
-       global time_for_run_new
-       global time_for_run
-       global default_light_falloff_new
-       global default_light_falloff
-       global direction
-       global bidirectional
-       global fade_status
-       global fade_start_time
-       global gap_between_lights_ms
-       global randomised
-       if timenow > last_random_change + rand_change_time*1000: # It's time to randomise
-          if fade_status == "none":
-             fade_status="fade"
-             fade_start_time = timenow
-          elif fade_status == "unfade" and randomised == "yes":
-            randomised="no"
-            last_random_change=current_milli_time()
-            if random.randint(1,100) > 25:
-               time_for_run_new = random.randint(250,25000)/1000
-               print("Random change. Set light run time from " + str(time_for_run) + " to " + str(time_for_run_new))
-               time_for_run = time_for_run_new
-            if random.randint(1,100) > 25:
-               lights_at_a_time_new = random.randint(1,round(no_of_lights/10))
-               if lights_at_a_time_new != lights_at_a_time:
-                  print("Random change. Set lights at a time from " + str(lights_at_a_time) + " to " + str(lights_at_a_time_new))
-                  lights_at_a_time = lights_at_a_time_new
-            if random.randint(1,100) > 50:
-               if random.randint(1,100) > 50:
-                  default_light_falloff_new = random.uniform(1,round(no_of_lights/5))
-               else:
-                  default_light_falloff_new = str(random.uniform(1,round(no_of_lights/5))) + "-" + str(random.uniform(1,round(no_of_lights/5)))
-               if default_light_falloff_new != default_light_falloff:
-                  print("Random change. Default light falloff changed from " + str(default_light_falloff) + " to " + str(default_light_falloff_new))
-                  default_light_falloff = default_light_falloff_new
-            if random.randint(1,100) > 50:
-               direction_new = "negative"
-            else:
-               direction_new = "positive"
-            if direction_new != direction:
-               print("Random change. Direction changed from " + str(direction) + " to " + str(direction_new))
-               direction = direction_new
-            if random.randint(1,100) > 50:
-               bidirectional_new = "y"
-            else:
-               bidirectional_new = "n"
-            if bidirectional_new != bidirectional:
-               print("Random change. Bidirectional boolean changed from " + str(bidirectional) + " to " + str(bidirectional_new))
-               bidirectional = bidirectional_new
-            gap_between_lights_ms=gap_between_lights()
+     # Change settings at random. Wait between 10-30 seconds between changes before changing again.
+     global last_random_change
+     global lights_at_a_time_new
+     global lights_at_a_time
+     global time_for_run_new
+     global time_for_run
+     global default_light_falloff_new
+     global default_light_falloff
+     global direction
+     global bidirectional
+     global fade_status
+     global fade_start_time
+     global gap_between_lights_ms
+     global randomised
+     if fade_status == "fade" and fade_factor == 0:
+        print("Now I triggered")
+        last_random_change = timenow
+        
+        if random.randint(1,100) > 25:
+          time_for_run_new = random.randint(250,25000)/1000
+          #print("Random chan/10000ge. Set light run time from " + str(time_for_run) + " to " + str(time_for_run_new))
+          time_for_run = time_for_run_new
+        if random.randint(1,100) > 25:
+          lights_at_a_time_new = random.randint(1,round(no_of_lights/10))
+          if lights_at_a_time_new != lights_at_a_time:
+             #print("Random change. Set lights at a time from " + str(lights_at_a_time) + " to " + str(lights_at_a_time_new))
+             lights_at_a_time = lights_at_a_time_new
+        if random.randint(1,100) > 50:
+          if random.randint(1,100) > 50:
+             default_light_falloff_new = random.uniform(1,round(no_of_lights/5))
+          else:
+             default_light_falloff_new = str(random.uniform(1,round(no_of_lights/5))) + "-" + str(random.uniform(1,round(no_of_lights/5)))
+          if default_light_falloff_new != default_light_falloff:
+             #print("Random change. Default light falloff changed from " + str(default_light_falloff) + " to " + str(default_light_falloff_new))
+             default_light_falloff = default_light_falloff_new
+        if random.randint(1,100) > 50:
+          direction_new = "negative"
+        else:
+          direction_new = "positive"
+        if direction_new != direction:
+          #print("Random change. Direction changed from " + str(direction) + " to " + str(direction_new))
+          direction = direction_new
+        if random.randint(1,100) > 50:
+          bidirectional_new = "y"
+        else:
+          bidirectional_new = "n"
+        if bidirectional_new != bidirectional:
+          #print("Random change. Bidirectional boolean changed from " + str(bidirectional) + " to " + str(bidirectional_new))
+          bidirectional = bidirectional_new
+        gap_between_lights_ms=gap_between_lights()
+        fade_status="unfade"
+     elif timenow > last_random_change + rand_change_time*1000: # It's time to randomise
+        if fade_status == "none":
+           print("triggering")
+           fade_status="fade"
+           fade_start_time = timenow
+      
 
 
 def calculate_light(light_dir):
@@ -186,20 +189,29 @@ if isinstance(default_light_falloff, float):
     colours_in_play[fps_count] = give_me_a_colour(direction,default_light_falloff,time_for_run)
 else:
     colours_in_play[fps_count] = give_me_a_colour(direction,random.uniform(float(default_light_falloff.split("-")[0]),float(default_light_falloff.split("-")[1])),time_for_run)
+    
+# All variables pre-set now let's loop...
 while True:
    loop_time=current_milli_time()
+   timenow=loop_time
    frames += 1
+   
+   # Prints the Frames per second every 5 seconds
    if loop_time >= fps_count + 5000:
        print("FPS = " + str(int(frames / ((loop_time - fps_count)/1000))))
        frames = 0
        fps_count = loop_time
 
+   # Blank out the pixel array so that everything can be recalculated this loop
    for i in range(no_of_lights):
        light_values_now[i]= [0,0,0]
 
-   timenow=current_milli_time()
-   # Calculate the current gap
+   # Calculate the current time gap since
    t_delta = timenow - timelast
+
+   # Calculate fading for random transition
+   if randomise == "y":
+      set_fade_factor(timenow,last_random_change)
 
    # Insert a new colour should the gap be big enough and reset gap timer
    if t_delta >= gap_between_lights_ms:
@@ -235,8 +247,6 @@ while True:
           colours_in_play.pop(colour_time)
           continue
 
-     # Calculate fading for random transition
-     set_fade_factor(timenow,last_random_change)
 
      # Calculate the light on the bulbs in its influence
      closest_low_pos = math.floor(position)
@@ -261,5 +271,5 @@ while True:
 #       print(str(i) + " " + str(light_values_now[i][0] + light_values_now[i][1] + light_values_now[i][2]))
 #   pprint(colours_in_play)
 #   sys.exit()
-
-   do_randomisation(timenow)
+   if randomise == "y":
+      do_randomisation(timenow)
