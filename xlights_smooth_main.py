@@ -8,8 +8,6 @@ from pprint import pprint
 from time import sleep
 import sys
 
-
-
 # g,r,b
 def current_milli_time():
     return round(time.time() * 1000)
@@ -52,66 +50,85 @@ def set_fade_factor(timenow,last_random_change):
             fade_factor=1
             fade_status="none"
             print("Unfading complete")
+            
+# Tunable common variables - i.e. not module specific
+no_of_lights=100
+timelast=current_milli_time()
+start_time=timelast
+randomise="y"
+randomised="no"
+rand_change_time=5 # Sets the initial random change time in seconds
+max_rand_change_time=30 # Define the maximum random change time (not currently used?)
+fading_time_ms=1000 # Defines how long fade in/out takes in milliseconds
+
+# Non-tunable variables
+pixels = neopixel.NeoPixel(board.D18, no_of_lights, auto_write=False)
+last_random_change=start_time
+fade_status="none"
+fade_factor=1
+first_run="yes"
 
 def do_randomisation(timenow):
-     # Change settings at random. Wait between 10-30 seconds between changes before changing again.
-     global last_random_change
-     global lights_at_a_time_new
-     global lights_at_a_time
-     global time_for_run_new
-     global time_for_run
-     global default_light_falloff_new
-     global default_light_falloff
-     global direction
-     global bidirectional
-     global fade_status
-     global fade_start_time
-     global gap_between_lights_ms
-     global randomised
-     if fade_status == "fade" and fade_factor == 0:
-        print("Now I triggered")
-        last_random_change = timenow
+      # Change settings at random. Wait between 10-30 seconds between changes before changing again.
+      global last_random_change
+      global lights_at_a_time_new
+      global lights_at_a_time
+      global time_for_run_new
+      global time_for_run
+      global default_light_falloff_new
+      global default_light_falloff
+      global direction
+      global bidirectional
+      global fade_status
+      global fade_start_time
+      global gap_between_lights_ms
+      global randomised
+      if fade_status == "fade" and fade_factor == 0:
+         print("Now I triggered")
+         last_random_change = timenow
         
-        if random.randint(1,100) > 25:
-          time_for_run_new = random.randint(250,25000)/1000
-          #print("Random chan/10000ge. Set light run time from " + str(time_for_run) + " to " + str(time_for_run_new))
-          time_for_run = time_for_run_new
-        if random.randint(1,100) > 25:
-          lights_at_a_time_new = random.randint(1,round(no_of_lights/10))
-          if lights_at_a_time_new != lights_at_a_time:
-             #print("Random change. Set lights at a time from " + str(lights_at_a_time) + " to " + str(lights_at_a_time_new))
-             lights_at_a_time = lights_at_a_time_new
-        if random.randint(1,100) > 50:
-          if random.randint(1,100) > 50:
-             default_light_falloff_new = random.uniform(1,round(no_of_lights/5))
-          else:
-             default_light_falloff_new = str(random.uniform(1,round(no_of_lights/5))) + "-" + str(random.uniform(1,round(no_of_lights/5)))
-          if default_light_falloff_new != default_light_falloff:
-             #print("Random change. Default light falloff changed from " + str(default_light_falloff) + " to " + str(default_light_falloff_new))
-             default_light_falloff = default_light_falloff_new
-        if random.randint(1,100) > 50:
-          direction_new = "negative"
-        else:
-          direction_new = "positive"
-        if direction_new != direction:
-          #print("Random change. Direction changed from " + str(direction) + " to " + str(direction_new))
-          direction = direction_new
-        if random.randint(1,100) > 50:
-          bidirectional_new = "y"
-        else:
-          bidirectional_new = "n"
-        if bidirectional_new != bidirectional:
-          #print("Random change. Bidirectional boolean changed from " + str(bidirectional) + " to " + str(bidirectional_new))
-          bidirectional = bidirectional_new
-        gap_between_lights_ms=gap_between_lights()
-        fade_status="unfade"
-     elif timenow > last_random_change + rand_change_time*1000: # It's time to randomise
-        if fade_status == "none":
-           print("triggering")
-           fade_status="fade"
-           fade_start_time = timenow
+         if random.randint(1,100) > 25:
+           time_for_run_new = random.randint(250,25000)/1000
+           #print("Random chan/10000ge. Set light run time from " + str(time_for_run) + " to " + str(time_for_run_new))
+           time_for_run = time_for_run_new
+         if random.randint(1,100) > 25:
+           lights_at_a_time_new = random.randint(1,round(no_of_lights/10))
+           if lights_at_a_time_new != lights_at_a_time:
+              #print("Random change. Set lights at a time from " + str(lights_at_a_time) + " to " + str(lights_at_a_time_new))
+              lights_at_a_time = lights_at_a_time_new
+         if random.randint(1,100) > 50:
+           if random.randint(1,100) > 50:
+              default_light_falloff_new = random.uniform(1,round(no_of_lights/5))
+           else:
+              default_light_falloff_new = str(random.uniform(1,round(no_of_lights/5))) + "-" + str(random.uniform(1,round(no_of_lights/5)))
+           if default_light_falloff_new != default_light_falloff:
+              #print("Random change. Default light falloff changed from " + str(default_light_falloff) + " to " + str(default_light_falloff_new))
+              default_light_falloff = default_light_falloff_new
+         if random.randint(1,100) > 50:
+           direction_new = "negative"
+         else:
+           direction_new = "positive"
+         if direction_new != direction:
+           #print("Random change. Direction changed from " + str(direction) + " to " + str(direction_new))
+           direction = direction_new
+         if random.randint(1,100) > 50:
+           bidirectional_new = "y"
+         else:
+           bidirectional_new = "n"
+         if bidirectional_new != bidirectional:
+           #print("Random change. Bidirectional boolean changed from " + str(bidirectional) + " to " + str(bidirectional_new))
+           bidirectional = bidirectional_new
+         gap_between_lights_ms=gap_between_lights()
+         fade_status="unfade"
+      elif timenow > last_random_change + rand_change_time*1000: # It's time to randomise
+         if fade_status == "none":
+            print("triggering")
+            fade_status="fade"
+            fade_start_time = timenow
       
 # Import light pattern modules
+#sys.path.append('./xlights_smooth_modules')
+#from smooth_with_random_changes import *
 
 def calculate_light(light_dir):
     global x
@@ -151,23 +168,8 @@ def calculate_light(light_dir):
                    if light_values_next[bulb_no][p] > light_values_now[bulb_no][p]:
                       light_values_now[bulb_no][p] = light_values_next[bulb_no][p]
             x+=1
-
-# Tunable common variables - i.e. not module specific
-no_of_lights=100
-timelast=current_milli_time()
-start_time=timelast
-randomise="y"
-randomised="no"
-rand_change_time=5 # Sets the initial random change time in seconds
-max_rand_change_time=30 # Define the maximum random change time (not currently used?)
-fading_time_ms=1000 # Defines how long fade in/out takes in milliseconds
-
-# Non-tunable variables
-pixels = neopixel.NeoPixel(board.D18, no_of_lights, auto_write=False)
-last_random_change=start_time
-fade_status="none"
-fade_factor=1
-first_run="yes"
+            
+##### Last change on 15th of October. Trying to break out the modules into separate files. Error on variables in those files that I need to solve
 
 ############################# Specific module vars start ####################################
 time_for_run=30
