@@ -1,5 +1,8 @@
 import time
 import random
+import sys
+from os import listdir
+from os.path import isfile, join
 import xlights_common_vars as com_var
 
 def current_milli_time():
@@ -16,17 +19,24 @@ def give_me_a_colour(direction,light_falloff,time_for_run):
     return (a,b,c,direction,light_falloff,time_for_run) 
 
 def set_fade_factor(timenow,last_random_change):
-     if com_var.fade_status == "fade":
+    if com_var.fade_status == "fade":
         com_var.fade_factor = 1-(timenow-com_var.fade_start_time)/com_var.fading_time_ms
-        print("Fading to zero")
         if com_var.fade_factor < 0.005:
-            com_var.fade_factor=0
-            print("Fading complete")
-        
-     elif com_var.fade_status == "unfade" :
-        com_var.fade_factor = (timenow-last_random_change)/com_var.fading_time_ms
-        print("Unfading from zero")
+           com_var.fade_factor=0
+           print("Fading complete")
+
+    elif com_var.fade_status == "unfade":
+        com_var.fade_factor = (timenow-com_var.fade_start_time)/com_var.fading_time_ms
         if com_var.fade_factor >= 1:
-            com_var.fade_factor=1
-            com_var.fade_status="none"
-            print("Unfading complete")
+           com_var.fade_factor=1
+           com_var.fade_status="complete"
+           print("Unfading complete")
+
+def list_modules(mods_dir):
+	files = listdir(mods_dir)
+	found_modules = []
+	for i in files:
+		if isfile(join(mods_dir, i)) and i[-3:] == ".py" and i != "__init__.py":
+			found_modules.append(i[:-3])
+	return(found_modules)
+	
