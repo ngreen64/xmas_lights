@@ -44,11 +44,12 @@ def select_a_random_module():
       current_module = importlib.import_module(module_in_use, package=None)
 
 try: 
+   print("Trying to launch " + str(sys.argv[1]))
    current_module = importlib.import_module(sys.argv[1], package=None)
-except:
+except Exception as e:
+   print(e)
    select_a_random_module()
    com_var.randomise_modules="y"
-   
 
 fps=0
 fps_count=com_func.current_milli_time()
@@ -66,10 +67,6 @@ while True:
        frames = 0
        fps_count = loop_time
 
-   # Blank out the pixel array so that everything can be recalculated this loop
-   for i in range(com_var.no_of_lights):
-       com_var.light_values_now[i]= [0,0,0]
-
    # Calculate the current time gap since
    com_var.t_delta = com_var.timenow - com_var.timelast
 
@@ -82,7 +79,10 @@ while True:
          if com_var.fade_status != "unfade":
             com_var.fade_status = "unfade"
             com_var.fade_start_time = com_var.timenow
+            print("####################################################################")
+            current_module.close_out_module()
             select_a_random_module()
+            current_module.run_once_at_start()
          com_func.set_fade_factor(com_var.timenow,com_var.last_random_module_change)
       if com_var.timenow > com_var.last_random_module_change + com_var.rand_module_change_time*1000:
          if com_var.fade_status == "none":
@@ -92,23 +92,19 @@ while True:
    
    if com_var.first_run == "yes":
       current_module.run_once_at_start()
+
    
    current_module.run_each_loop()
  
-
    for item in com_var.light_values_now:
         try:
             pixels[item] = [com_var.light_values_now[item][0]*com_var.fade_factor, com_var.light_values_now[item][1]*com_var.fade_factor, com_var.light_values_now[item][2]*com_var.fade_factor]
         except Exception as e:
-            pprint(light_values_now)
-            pprint(colours_in_play)
+            pprint(com_var.light_values_now)
             print(e)
             sys.exit()
-
+            
    pixels.show()
 
-# Need to rethink the randomisation part and randomise both in and out of modules
-#   if com_var.randomise == "y":
-#      current_module.do_randomisation(com_var.timenow)
    if com_var.first_run == "yes":
       com_var.first_run="no"

@@ -117,11 +117,6 @@ def randomise_if_needed():
      if com_var.timenow > module_random_change_interval*1000 + com_var.last_random_change:
         do_randomisation()
 
-####  This is the next bit to work on.  I need to come up with some common names for the functions that will be called, e.g. "run_at_start" + "run_each_loop".  For example, inserting new colours
-# is only being ran at present once when this module is initialized!
-
-# This stuff below, probably need to put this into a function and call it from the main program loop
-
 def run_once_at_start():
    global default_light_falloff
    do_randomisation()
@@ -130,6 +125,9 @@ def run_once_at_start():
    else:
       colours_in_play[com_var.timenow] = com_func.give_me_a_colour(direction,random.uniform(float(default_light_falloff.split("-")[0]),float(default_light_falloff.split("-")[1])),time_for_run)
 
+def close_out_module():
+   print("Closing module")
+
 def run_each_loop():
    global lights_at_a_time
    global direction
@@ -137,6 +135,7 @@ def run_each_loop():
    global bidirectional
    global x
    global position
+   com_func.blank_array()
    randomise_if_needed()
    # Insert a new colour should the gap be big enough and reset gap timer
    if com_var.t_delta >= gap_between_lights_ms:

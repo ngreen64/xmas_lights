@@ -1,9 +1,9 @@
 # Tunable common variables - i.e. not module specific
-no_of_lights=100
+no_of_lights=150
 randomise_modules="n"
 randomised="no"
-rand_change_time=5 # Sets the initial random change time in seconds inside modules
-rand_module_change_time=25 # Sets the random change between modules themselves
+rand_change_time=30 # Sets the initial random change time in seconds inside modules
+rand_module_change_time=300 # Sets the random change between modules themselves
 max_rand_change_time=30 # Define the maximum random change time (not currently used?)
 fading_time_ms=1000 # Defines how long fade in/out takes in milliseconds
 mods_dir='./xlights_smooth_modules'
