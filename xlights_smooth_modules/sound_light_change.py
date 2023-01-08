@@ -167,7 +167,7 @@ def run_each_loop():
    data = stream.read(chunk, exception_on_overflow = False)
    matrix=calculate_levels(data, chunk,sample_rate)
    com_func.blank_array()
-   if matrix[1] > 200:
+   if matrix[0] > 140:
       if base_beat == 0:
          randomise_current_lights()
          base_beat = 1

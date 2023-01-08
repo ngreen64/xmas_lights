@@ -1,5 +1,5 @@
 # Tunable common variables - i.e. not module specific
-no_of_lights=150
+no_of_lights=200
 randomise_modules="n"
 randomised="no"
 rand_change_time=30 # Sets the initial random change time in seconds inside modules
